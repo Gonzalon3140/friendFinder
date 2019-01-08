@@ -1,0 +1,32 @@
+.container {
+    font-family: 'Shadows Into Light', cursive;
+}
+
+
+
+#questions {
+    color: rgb(243, 6, 6);
+    float: right;
+    background-color: rgb(122, 140, 196);
+}
+
+
+.footer {
+    height: 35px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    background: slategrey;
+}
+
+#api {
+    margin-left: 10px;
+}
+
+.name {
+    float: right;
+    margin-right: 10px;
+    font-family: 'ZCOOL XiaoWei', serif;
+}
+
+/* survey */

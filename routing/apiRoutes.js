@@ -1,47 +1,45 @@
-// ===============================================================================
-// LOAD DATA
-// We are linking our routes to a series of "data" sources.
-// These data sources hold arrays of information on table-data, waitinglist, etc.
-// ===============================================================================
-
-let friends = require("./../app/data/friends")
-
-
-// ===============================================================================
-// ROUTING
-// ===============================================================================
+var express = require("express");
+var apiRoute = express.Router();
+var friends = require("../app/data/friends");
 
 module.exports = function (app) {
-    // API GET Requests
-    // Below code handles when users "visit" a page.
-    // In each of the below cases when a user visits a link
-    // (ex: localhost:PORT/api/admin... they are shown a JSON of the data in the table)
-    // ---------------------------------------------------------------------------
-
-    app.post("/api/findBestFriend", function (req, res) {
-        // req.body hosts is equal to the JSON post sent from the user
-        // This works because of our body parsing middleware\
-        console.log('hit');
-        console.log(friends)
-        console.log(req.body);
-
+    // GET route with url "/api/friends" shows all friends in JSON format
+    app.get("/api/friends", function (req, res) {
+        res.json(friends);
     });
 
-
-
-
-    // API POST Requests
-    // Below code handles when a user submits a form and thus submits data to the server.
-    // In each of the below cases, when a user submits form data (a JSON object)
-    // ...the JSON is pushed to the appropriate JavaScript array
-    // (ex. User fills out a reservation request... this data is then sent to the server...
-    // Then the server saves the data to the tableData array)
-    // ---------------------------------------------------------------------------
-
-
-
-    // ---------------------------------------------------------------------------
-    // I added this below code so you could clear out the table while working with the functionality.
-    // Don"t worry about it!
-
+    // POST route with url "/api/friends" handles incoming survey results and compatibility logic
+    app.post("/api/friends", function (req, res) {
+        var curUser = req.body;
+        var mostCompat;
+        var dbDiff = 40;
+        var dupl = false;
+        console.log(friends)
+        for (i = 0; i < friends.length; i++) {
+            if (friends[i].email == curUser.email) {
+                dupl = true;
+                break;
+            } else {
+                var curFriendDiff = 0;
+                for (j = 0; j < 10; j++) {
+                    curFriendDiff += Math.abs(friends[i].scores[j] - curUser.scores[j]);
+                }
+                if (curFriendDiff < dbDiff) {
+                    dbDiff = curFriendDiff;
+                    mostCompat = friends[i];
+                }
+            }
+        }
+        if (dupl) {
+            mostCompat = curUser;
+            res.json(mostCompat);
+        } else {
+            curUser.inScore = dbDiff;
+            curUser.lastBestFit = dbDiff;
+            mostCompat.lastBestFit = dbDiff;
+            friends.push(curUser);
+            res.json(mostCompat);
+        }
+        console.log(friends);
+    });
 };
